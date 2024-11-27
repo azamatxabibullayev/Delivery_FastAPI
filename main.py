@@ -3,7 +3,7 @@ from auth_routers import auth_router
 from products import product_router
 from order_routers import order_router
 from fastapi_jwt_auth import AuthJWT
-from schemas import Settings, LoginModel
+from schemas import Settings
 
 app = FastAPI()
 
@@ -20,4 +20,4 @@ app.include_router(order_router)
 
 @app.get('/')
 async def get_home():
-    return {'message': 'Welcome to the FastAPI-Auth API!'}
+    return {'message': 'Welcome to the Delivery FastAPI'}

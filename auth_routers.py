@@ -23,19 +23,16 @@ async def auth_(Authorize: AuthJWT = Depends()):
     return {"message": "Hello auth"}
 
 
-@auth_router.get("/")
-async def auth_():
-    return {"message": "Hello auth"}
-
-
 @auth_router.post('/signup', status_code=201)
 async def signup(user: SignupModel):
     db_email = session.query(User).filter(User.email == user.email).first()
     if db_email is not None:
         return {'message': 'Email already exists', 'status_code': status.HTTP_400_BAD_REQUEST}
+
     db_username = session.query(User).filter(User.username == user.username).first()
     if db_username is not None:
         return {'message': 'Username already exists', 'status_code': status.HTTP_400_BAD_REQUEST}
+
     new_user = User(
         username=user.username,
         email=user.email,
@@ -46,7 +43,6 @@ async def signup(user: SignupModel):
     session.add(new_user)
     session.commit()
     user_data = {
-
         'username': user.username,
         'email': user.email,
         'is_active': user.is_active,
@@ -61,13 +57,12 @@ async def login(user: LoginModel, Authorize: AuthJWT = Depends()):
         or_(
             User.username == user.username_or_email, User.email == user.username_or_email
         )).first()
+
     if db_user and check_password_hash(db_user.password, user.password):
         access_lifetime = datetime.timedelta(minutes=60)
         refresh_lifetime = datetime.timedelta(days=3)
-        access_token = Authorize.create_access_token(subject=db_user.username,
-                                                     expires_time=access_lifetime)
-        refresh_token = Authorize.create_refresh_token(subject=db_user.username,
-                                                       expires_time=refresh_lifetime)
+        access_token = Authorize.create_access_token(subject=db_user.username, expires_time=access_lifetime)
+        refresh_token = Authorize.create_refresh_token(subject=db_user.username, expires_time=refresh_lifetime)
         token = {
             "access_token": access_token,
             "refresh_token": refresh_token
@@ -78,5 +73,5 @@ async def login(user: LoginModel, Authorize: AuthJWT = Depends()):
             'token': token
         }
         return response_data
-    raise HTTPException(status=status.HTTP_400_BAD_REQUEST,
-                        detail='Invalid username, email or password')
+
+    raise HTTPException(status=status.HTTP_400_BAD_REQUEST, detail='Invalid username, email or password')

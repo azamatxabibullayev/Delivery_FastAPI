@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import HTTPException
 from database import engine, SesionLocal
-from models import Product, User
+from models import Product
 from fastapi_jwt_auth import AuthJWT
 from schemas import ProductSchema
 
@@ -31,5 +31,6 @@ async def create_product(product: ProductSchema, Authorize: AuthJWT = Depends())
     session.add(new_product)
     session.commit()
     session.refresh(new_product)
+    session.close()  # Ensure session is closed
 
     return new_product
